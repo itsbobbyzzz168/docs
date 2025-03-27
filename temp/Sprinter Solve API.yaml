@@ -1,202 +1,194 @@
-{\rtf1\ansi\ansicpg1252\cocoartf2821
-\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
-{\colortbl;\red255\green255\blue255;}
-{\*\expandedcolortbl;;}
-\paperw11900\paperh16840\margl1440\margr1440\vieww11520\viewh8400\viewkind0
-\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+openapi: 3.0.3
+info:
+  title: Sprinter Solve API
+  description: API specification for Sprinter Solve API to retrieve quotes and execution routes for token swaps.
+  version: "2.0"
+servers:
+  - url: https://swaps.sprinter.tech/{network}
+    variables:
+      network:
+        enum:
+          - mainnet
+          - base
+        default: mainnet
+security:
+  - ApiKeyAuth: []
+paths:
+  /quote:
+    get:
+      summary: Get Quote
+      description: Returns the expected output amount for a token swap.
+      parameters:
+        - in: query
+          name: amount_in
+          required: true
+          schema:
+            type: string
+          description: Amount of tokens to sell (decimal).
+        - in: query
+          name: token_in
+          required: true
+          schema:
+            $ref: '#/components/schemas/Address'
+          description: Token address to sell.
+        - in: query
+          name: token_out
+          required: true
+          schema:
+            $ref: '#/components/schemas/Address'
+          description: Token address to buy.
+      responses:
+        '200':
+          description: Successful Quote
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  amount_out:
+                    $ref: '#/components/schemas/TokenAmount'
+        '400':
+          $ref: '#/components/responses/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/ErrorResponse'
+        '500':
+          $ref: '#/components/responses/ErrorResponse'
 
-\f0\fs24 \cf0 openapi: 3.0.3\
-info:\
-  title: Sprinter Solve API\
-  description: API specification for Sprinter Solve API to retrieve quotes and execution routes for token swaps.\
-  version: "2.0"\
-servers:\
-  - url: https://swaps.sprinter.tech/\{network\}\
-    variables:\
-      network:\
-        enum:\
-          - mainnet\
-          - base\
-        default: mainnet\
-security:\
-  - ApiKeyAuth: []\
-paths:\
-  /quote:\
-    get:\
-      summary: Get Quote\
-      description: Returns the expected output amount for a token swap.\
-      parameters:\
-        - in: query\
-          name: amount_in\
-          required: true\
-          schema:\
-            type: string\
-          description: Amount of tokens to sell (decimal).\
-        - in: query\
-          name: token_in\
-          required: true\
-          schema:\
-            $ref: '#/components/schemas/Address'\
-          description: Token address to sell.\
-        - in: query\
-          name: token_out\
-          required: true\
-          schema:\
-            $ref: '#/components/schemas/Address'\
-          description: Token address to buy.\
-      responses:\
-        '200':\
-          description: Successful Quote\
-          content:\
-            application/json:\
-              schema:\
-                type: object\
-                properties:\
-                  amount_out:\
-                    $ref: '#/components/schemas/TokenAmount'\
-        '400':\
-          $ref: '#/components/responses/ErrorResponse'\
-        '401':\
-          $ref: '#/components/responses/ErrorResponse'\
-        '500':\
-          $ref: '#/components/responses/ErrorResponse'\
-\
-  /route:\
-    get:\
-      summary: Get Execution Route\
-      description: Returns the execution route for a token swap.\
-      parameters:\
-        - in: query\
-          name: amount_in\
-          required: true\
-          schema:\
-            type: string\
-          description: Amount of tokens to sell (decimal).\
-        - in: query\
-          name: token_in\
-          required: true\
-          schema:\
-            $ref: '#/components/schemas/Address'\
-          description: Token address to sell.\
-        - in: query\
-          name: min_amount_out\
-          required: true\
-          schema:\
-            type: string\
-          description: Minimum amount to receive (decimal).\
-        - in: query\
-          name: token_out\
-          required: true\
-          schema:\
-            $ref: '#/components/schemas/Address'\
-          description: Token address to buy.\
-      responses:\
-        '200':\
-          description: Successful Route\
-          content:\
-            application/json:\
-              schema:\
-                type: object\
-                properties:\
-                  target:\
-                    $ref: '#/components/schemas/Address'\
-                  swapCallData:\
-                    type: string\
-        '400':\
-          $ref: '#/components/responses/ErrorResponse'\
-        '401':\
-          $ref: '#/components/responses/ErrorResponse'\
-        '500':\
-          $ref: '#/components/responses/ErrorResponse'\
-\
-  /v2/route:\
-    get:\
-      summary: Get Execution Route (V2)\
-      description: Returns the execution route for a token swap (version 2).\
-      parameters:\
-        - in: query\
-          name: amount_in\
-          required: true\
-          schema:\
-            type: string\
-          description: Amount of tokens to sell.\
-        - in: query\
-          name: token_in\
-          required: true\
-          schema:\
-            $ref: '#/components/schemas/Address'\
-          description: Token address to sell.\
-        - in: query\
-          name: token_out\
-          required: true\
-          schema:\
-            $ref: '#/components/schemas/Address'\
-          description: Token address to buy.\
-        - in: query\
-          name: slippage\
-          required: false\
-          schema:\
-            type: number\
-            format: float\
-            default: 0\
-          description: Slippage percentage (e.g., 0.05 for 0.5%).\
-        - in: query\
-          name: target_duration_ms\
-          required: false\
-          schema:\
-            type: integer\
-            default: 200\
-          description: Maximum route computation time in milliseconds.\
-      responses:\
-        '200':\
-          description: Successful Route (V2)\
-          content:\
-            application/json:\
-              schema:\
-                type: object\
-                properties:\
-                  quote_id:\
-                    type: string\
-                  amount_out:\
-                    $ref: '#/components/schemas/TokenAmount'\
-                  min_amount_out:\
-                    $ref: '#/components/schemas/TokenAmount'\
-                  target:\
-                    $ref: '#/components/schemas/Address'\
-                  swap_call_data:\
-                    type: string\
-                  rainbow_input:\
-                    type: string\
-        '400':\
-          $ref: '#/components/responses/ErrorResponse'\
-        '401':\
-          $ref: '#/components/responses/ErrorResponse'\
-        '500':\
-          $ref: '#/components/responses/ErrorResponse'\
-\
-components:\
-  securitySchemes:\
-    ApiKeyAuth:\
-      type: apiKey\
-      in: header\
-      name: X-API-Key\
-  schemas:\
-    Address:\
-      type: string\
-      description: 20-byte Ethereum address, checksum format.\
-      example: "0x6B175474E89094C44Da98b954EedeAC495271d0F"\
-    TokenAmount:\
-      type: string\
-      description: Decimal string representation of amount (18 decimals for most tokens).\
-      example: "1000000000000000000"\
-  responses:\
-    ErrorResponse:\
-      description: Error response\
-      content:\
-        application/json:\
-          schema:\
-            type: object\
-            properties:\
-              error:\
-                type: string\
-}
+  /route:
+    get:
+      summary: Get Execution Route
+      description: Returns the execution route for a token swap.
+      parameters:
+        - in: query
+          name: amount_in
+          required: true
+          schema:
+            type: string
+          description: Amount of tokens to sell (decimal).
+        - in: query
+          name: token_in
+          required: true
+          schema:
+            $ref: '#/components/schemas/Address'
+          description: Token address to sell.
+        - in: query
+          name: min_amount_out
+          required: true
+          schema:
+            type: string
+          description: Minimum amount to receive (decimal).
+        - in: query
+          name: token_out
+          required: true
+          schema:
+            $ref: '#/components/schemas/Address'
+          description: Token address to buy.
+      responses:
+        '200':
+          description: Successful Route
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  target:
+                    $ref: '#/components/schemas/Address'
+                  swapCallData:
+                    type: string
+        '400':
+          $ref: '#/components/responses/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/ErrorResponse'
+        '500':
+          $ref: '#/components/responses/ErrorResponse'
+
+  /v2/route:
+    get:
+      summary: Get Execution Route (V2)
+      description: Returns the execution route for a token swap (version 2).
+      parameters:
+        - in: query
+          name: amount_in
+          required: true
+          schema:
+            type: string
+          description: Amount of tokens to sell.
+        - in: query
+          name: token_in
+          required: true
+          schema:
+            $ref: '#/components/schemas/Address'
+          description: Token address to sell.
+        - in: query
+          name: token_out
+          required: true
+          schema:
+            $ref: '#/components/schemas/Address'
+          description: Token address to buy.
+        - in: query
+          name: slippage
+          required: false
+          schema:
+            type: number
+            format: float
+            default: 0
+          description: Slippage percentage (e.g., 0.05 for 0.5%).
+        - in: query
+          name: target_duration_ms
+          required: false
+          schema:
+            type: integer
+            default: 200
+          description: Maximum route computation time in milliseconds.
+      responses:
+        '200':
+          description: Successful Route (V2)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  quote_id:
+                    type: string
+                  amount_out:
+                    $ref: '#/components/schemas/TokenAmount'
+                  min_amount_out:
+                    $ref: '#/components/schemas/TokenAmount'
+                  target:
+                    $ref: '#/components/schemas/Address'
+                  swap_call_data:
+                    type: string
+                  rainbow_input:
+                    type: string
+        '400':
+          $ref: '#/components/responses/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/ErrorResponse'
+        '500':
+          $ref: '#/components/responses/ErrorResponse'
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+  schemas:
+    Address:
+      type: string
+      description: 20-byte Ethereum address, checksum format.
+      example: "0x6B175474E89094C44Da98b954EedeAC495271d0F"
+    TokenAmount:
+      type: string
+      description: Decimal string representation of amount (18 decimals for most tokens).
+      example: "1000000000000000000"
+  responses:
+    ErrorResponse:
+      description: Error response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
